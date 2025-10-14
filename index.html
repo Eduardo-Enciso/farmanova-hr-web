@@ -322,7 +322,6 @@
             document.getElementById('quiz-loader').classList.remove('hidden');
             const finalResult = { ...currentUser, scores, createdAt: serverTimestamp() };
             
-            // Intenta guardar en Firebase
             try {
                 await addDoc(collection(db, "farmaNovaResults"), finalResult);
             } catch (error) {
@@ -330,19 +329,16 @@
                 alert(`Error CRÍTICO al guardar en la base de datos: ${error.message}. Por favor, avisa al administrador.`);
                 document.getElementById('quiz-loader').classList.add('hidden');
                 document.getElementById('options-container').classList.remove('hidden');
-                return; // Detiene la ejecución si falla Firebase
+                return;
             }
 
-            // Intenta enviar el correo
             try {
                 const templateParams = { candidate_name: currentUser.name };
                 await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, { publicKey: emailJSConfig.publicKey });
             } catch (error) {
                 console.warn("La prueba se guardó correctamente, pero falló el envío de la notificación por email.", error);
-                // No se notifica al usuario de este error, ya que no es crítico.
             }
             
-            // Si todo (o al menos Firebase) funcionó, muestra la pantalla de agradecimiento.
             showScreen('thankYou');
             document.getElementById('quiz-loader').classList.add('hidden');
             document.getElementById('options-container').classList.remove('hidden');
@@ -397,14 +393,56 @@
             }
         }
         
+        function getDimensionDescription(dimension, score) {
+            const descriptions = {
+                responsabilidad: {
+                    high: "Muy alta. Perfil altamente organizado, confiable y orientado al detalle.",
+                    mid: "Adecuada. Muestra un buen nivel de compromiso y organización.",
+                    low: "Baja. Puede presentar dificultades con la planificación y el seguimiento de tareas."
+                },
+                sociabilidad: {
+                    high: "Muy alta. Perfil extrovertido, comunicativo y que disfruta del trabajo en equipo.",
+                    mid: "Adecuada. Se desenvuelve bien en entornos sociales y de colaboración.",
+                    low: "Baja. Prefiere el trabajo individual y puede ser reservado/a en grupos."
+                },
+                estabilidad: {
+                    high: "Muy alta. Gran capacidad para manejar el estrés y mantener la calma bajo presión.",
+                    mid: "Adecuada. Maneja las situaciones de presión de manera competente.",
+                    low: "Baja. Puede ser susceptible al estrés y a la frustración ante imprevistos."
+                },
+                apertura: {
+                    high: "Muy alta. Perfil muy curioso, creativo y abierto a nuevas ideas y cambios.",
+                    mid: "Adecuada. Se adapta a los cambios y muestra interés por aprender.",
+                    low: "Baja. Prefiere la rutina y los métodos establecidos, puede resistirse al cambio."
+                }
+            };
+            if (score > 3) return descriptions[dimension].high;
+            if (score >= -3) return descriptions[dimension].mid;
+            return descriptions[dimension].low;
+        }
+
         function showDetailedReport(docId) {
             const result = allResultsCache.find(r => r.docId === docId);
             if (!result) return;
-            const maxScore = 8, maxLieScore = 4;
-            const r = (result.scores.responsabilidad / maxScore), s = (result.scores.sociabilidad / maxScore), e = (result.scores.estabilidad / maxScore), a = (result.scores.apertura / maxScore);
-            const personalityScore = ((r * 0.3) + (s * 0.3) + (e * 0.2) + (a * 0.2)) * 10;
-            const liePenalty = (result.scores.mentira / maxLieScore) * 10;
-            let viability = Math.max(0, Math.min(10, personalityScore - liePenalty));
+
+            // --- LÓGICA DE EVALUACIÓN MEJORADA ---
+            const maxScore = 8;
+            const r = result.scores.responsabilidad / maxScore;
+            const s = result.scores.sociabilidad / maxScore;
+            const e = result.scores.estabilidad / maxScore;
+            const a = result.scores.apertura / maxScore;
+
+            const weightedAvg = (r * 0.3) + (s * 0.3) + (e * 0.2) + (a * 0.2);
+            const personalityScore = (weightedAvg + 1) / 2 * 10;
+
+            let liePenalty = 0;
+            if (result.scores.mentira >= 3) {
+                liePenalty = (result.scores.mentira - 2) * 2;
+            }
+
+            let viability = personalityScore - liePenalty;
+            viability = Math.max(0, Math.min(10, viability));
+
             const modalContent = document.getElementById('modal-content');
             modalContent.innerHTML = `
                 <div class="flex justify-between items-start">
@@ -413,7 +451,24 @@
                 </div>
                 <div class="mt-6 border-t pt-6">
                     <h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -8 a 8)</h4>
-                    <div class="space-y-3"><p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p><p><strong>Sociabilidad:</strong> ${result.scores.sociabilidad}</p><p><strong>Estabilidad Emocional:</strong> ${result.scores.estabilidad}</p><p><strong>Apertura al Cambio:</strong> ${result.scores.apertura}</p></div>
+                    <div class="space-y-4">
+                        <div>
+                            <p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p>
+                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('responsabilidad', result.scores.responsabilidad)}</p>
+                        </div>
+                        <div>
+                            <p><strong>Sociabilidad:</strong> ${result.scores.sociabilidad}</p>
+                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('sociabilidad', result.scores.sociabilidad)}</p>
+                        </div>
+                        <div>
+                            <p><strong>Estabilidad Emocional:</strong> ${result.scores.estabilidad}</p>
+                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('estabilidad', result.scores.estabilidad)}</p>
+                        </div>
+                        <div>
+                            <p><strong>Apertura al Cambio:</strong> ${result.scores.apertura}</p>
+                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('apertura', result.scores.apertura)}</p>
+                        </div>
+                    </div>
                     <h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Contradicción</h4>
                     <p class="${result.scores.mentira > 2 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -4 a 4) - ${result.scores.mentira > 2 ? 'Respuestas socialmente deseables detectadas.' : 'Respuestas consistentes.'}</p>
                 </div>
