@@ -12,13 +12,91 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .btn { @apply w-full px-6 py-3 text-lg font-bold text-white rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2; }
-        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 focus:ring-blue-500; }
-        .btn-secondary { @apply bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500; }
-        .form-input { @apply w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-lg shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition; }
+        .btn {
+            width: 100%;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+         .btn-primary:focus {
+            --tw-ring-color: #3b82f6;
+             box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color);
+        }
+        .btn-secondary {
+            background-color: #4f46e5;
+        }
+        .btn-secondary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary:focus {
+            --tw-ring-color: #6366f1;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #f9fafb;
+            border-width: 2px;
+            border-color: #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            color: #111827;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .form-input:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
         .hidden { display: none; }
-        .option-btn { @apply w-full text-center p-3 my-2 border-2 border-gray-300 rounded-lg hover:bg-gray-100 hover:border-blue-500 transition-colors duration-200 cursor-pointer; }
-        .option-btn.selected { @apply bg-blue-100 border-blue-600 ring-2 ring-blue-500; }
+        .option-btn {
+            width: 100%;
+            text-align: center;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-width: 2px;
+            border-color: #d1d5db;
+            border-radius: 0.5rem;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+            cursor: pointer;
+        }
+        .option-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #3b82f6;
+        }
+        .option-btn.selected {
+            background-color: #dbeafe;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
