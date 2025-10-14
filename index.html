@@ -118,8 +118,8 @@
 
         <!-- Pantallas y Lógica de la App -->
         <div id="welcome-container" class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
-            <!-- NOTA: Reemplaza esta URL con la de tu logo. Puedes subir tu imagen a un sitio como imgbb.com para obtener un enlace. -->
-            <img src="https://placehold.co/200x60/FFFFFF/003366?text=Farma+Nova+Logo" alt="Logo Farma Nova" class="mx-auto mb-6 h-14">
+            <!-- NOTA: Coloca tu logo en la carpeta 'assets' con este nombre de archivo -->
+            <img src="assets/logo-farma-nova.webp" alt="Logo Farma Nova" class="mx-auto mb-6 h-14">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-600">Droguería Farma Nova</h1>
             <p class="text-xl text-gray-600 mt-2">Gestión Humana</p>
             <div class="mt-10 space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
@@ -152,7 +152,8 @@
             </div>
 
             <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end">
-                <img src="https://placehold.co/120x40/FFFFFF/003366?text=Farma+Nova" alt="Logo Farma Nova" class="h-8">
+                 <!-- NOTA: Coloca tu logo para el pie de página en la carpeta 'assets' -->
+                <img src="assets/logo-farma-nova-footer.webp" alt="Logo Farma Nova" class="h-8">
             </div>
         </div>
 
@@ -188,17 +189,29 @@
 
     <!-- SDK de Firebase -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        // Se importa la función para inicializar Firebase y las funciones de Firestore
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // Tu configuración de Firebase (reemplazada con tus datos)
         const firebaseConfig = {
-            apiKey: "TU_API_KEY", authDomain: "TU_AUTH_DOMAIN", projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET", messagingSenderId: "TU_MESSAGING_SENDER_ID", appId: "TU_APP_ID"
-        };
-        const emailJSConfig = {
-            publicKey: "TU_PUBLIC_KEY", serviceID: "TU_SERVICE_ID", templateID: "TU_TEMPLATE_ID",
+            apiKey: "AIzaSyChvJf2ifEgSFCXlc0cmYvtdz3lNzuso_I",
+            authDomain: "farmanova-hr-web.firebaseapp.com",
+            projectId: "farmanova-hr-web",
+            storageBucket: "farmanova-hr-web.appspot.com",
+            messagingSenderId: "463013400303",
+            appId: "1:463013400303:web:f6ab22192914938d40151a",
+            measurementId: "G-7V9DE5Y0YW"
         };
 
+        // Configuración de EmailJS (reemplazada con tus datos)
+        const emailJSConfig = {
+            publicKey: "sLbTMJLSG8r-lb9n7", 
+            serviceID: "service_o6ssw7j", 
+            templateID: "template_lh6n0oo",
+        };
+
+        // Se inicializa Firebase y Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -311,7 +324,7 @@
             try {
                 await addDoc(collection(db, "farmaNovaResults"), finalResult);
                 const templateParams = { candidate_name: currentUser.name };
-                await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, emailJSConfig.publicKey);
+                await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, { publicKey: emailJSConfig.publicKey });
                 showScreen('thankYou');
             } catch (error) {
                 console.error("Error:", error);
