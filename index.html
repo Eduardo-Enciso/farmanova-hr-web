@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Personalidad - Droguería Farma Nova</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- SDK de EmailJS para notificaciones por correo -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .btn { @apply w-full px-6 py-3 text-lg font-bold text-white rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2; }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-700 focus:ring-blue-500; }
+        .btn-secondary { @apply bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500; }
+        .form-input { @apply w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-lg shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition; }
+        .hidden { display: none; }
+        .option-btn { @apply w-full text-center p-3 my-2 border-2 border-gray-300 rounded-lg hover:bg-gray-100 hover:border-blue-500 transition-colors duration-200 cursor-pointer; }
+        .option-btn.selected { @apply bg-blue-100 border-blue-600 ring-2 ring-blue-500; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="app-container" class="w-full max-w-2xl mx-auto">
+
+        <!-- Pantallas y Lógica de la App -->
+        <div id="welcome-container" class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
+            <!-- NOTA: Reemplaza esta URL con la de tu logo. Puedes subir tu imagen a un sitio como imgbb.com para obtener un enlace. -->
+            <img src="https://placehold.co/200x60/FFFFFF/003366?text=Farma+Nova+Logo" alt="Logo Farma Nova" class="mx-auto mb-6 h-14">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-600">Droguería Farma Nova</h1>
+            <p class="text-xl text-gray-600 mt-2">Gestión Humana</p>
+            <div class="mt-10 space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
+                <button id="start-test-btn" class="btn btn-primary">Realizar Prueba</button>
+                <button id="view-report-btn" class="btn btn-secondary">Ver Reporte de Prueba</button>
+            </div>
+        </div>
+
+        <div id="registration-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-800">Gracias por tu interés</h2>
+                <p class="text-gray-600 mt-4 max-w-lg mx-auto">A continuación, encontrarás una serie de afirmaciones. Por favor, responde con la mayor honestidad posible. Recuerda que no hay respuestas correctas o incorrectas. Queremos conocerte mejor.</p>
+            </div>
+            <form id="registration-form" class="mt-8 space-y-4">
+                <div><label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label><input type="text" id="nombre" class="form-input" required></div>
+                <div><label for="cedula" class="block text-sm font-medium text-gray-700 mb-1">Cédula</label><input type="text" id="cedula" class="form-input" required></div>
+                <button type="submit" class="!mt-8 btn btn-primary">Comenzar Prueba</button>
+            </form>
+        </div>
+
+        <div id="quiz-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <div class="mb-6"><div class="w-full bg-gray-200 rounded-full h-2.5"><div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div></div>
+            <h3 id="question-text" class="text-2xl font-bold text-gray-800 text-center min-h-[96px]"></h3>
+            <div id="options-container" class="mt-8 grid grid-cols-1 sm:grid-cols-5 gap-2"></div>
+            <div id="quiz-loader" class="hidden loader"></div>
+            
+            <div id="confirmation-container" class="hidden mt-6 flex justify-end items-center space-x-4">
+                <button id="confirm-btn" class="px-6 py-2 text-base font-bold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Confirmar</button>
+                <button id="next-btn" class="px-6 py-2 text-base font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" disabled>Siguiente</button>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end">
+                <img src="https://placehold.co/120x40/FFFFFF/003366?text=Farma+Nova" alt="Logo Farma Nova" class="h-8">
+            </div>
+        </div>
+
+        <div id="thank-you-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
+            <h2 class="text-3xl font-bold text-gray-800">¡Has finalizado!</h2>
+            <p class="text-gray-600 mt-4">Agradecemos sinceramente tu tiempo y honestidad. Hemos recibido tus respuestas.</p>
+            <p class="text-gray-600 mt-2">Pronto serás contactado/a para conocer la conclusión de este proceso de selección.</p>
+            <button id="back-to-home-btn" class="btn btn-primary mt-8">Volver al Inicio</button>
+        </div>
+
+        <div id="admin-login-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <h2 class="text-3xl font-bold text-gray-800 text-center">Acceso de Administrador</h2>
+            <form id="admin-login-form" class="mt-8 space-y-4">
+                <div><label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label><input type="text" id="username" class="form-input" value="ADMIN" required></div>
+                <div><label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label><input type="password" id="password" class="form-input" required></div>
+                <p id="admin-error" class="text-red-500 text-sm text-center hidden">Credenciales incorrectas.</p>
+                <button type="submit" class="!mt-8 btn btn-secondary">Ingresar</button>
+                <button type="button" id="admin-back-btn" class="!mt-4 w-full text-center py-2 text-gray-600 hover:text-black">Volver</button>
+            </form>
+        </div>
+
+        <div id="report-container" class="hidden w-full max-w-4xl bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold text-gray-800">Reporte de Pruebas</h2><button id="report-back-btn" class="text-gray-600 hover:text-black">Volver al Inicio</button></div>
+            <div id="report-loader" class="loader"></div>
+            <div id="report-content" class="hidden overflow-x-auto">
+                <table class="min-w-full bg-white"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Fecha y Hora</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Acción</th></tr></thead><tbody id="report-table-body" class="divide-y divide-gray-200"></tbody></table>
+                <p id="no-reports" class="text-center text-gray-500 mt-8 hidden">Aún no se han completado pruebas.</p>
+            </div>
+        </div>
+
+        <div id="report-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div id="modal-content" class="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg max-h-screen overflow-y-auto"></div></div>
+    </div>
+
+    <!-- SDK de Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY", authDomain: "TU_AUTH_DOMAIN", projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET", messagingSenderId: "TU_MESSAGING_SENDER_ID", appId: "TU_APP_ID"
+        };
+        const emailJSConfig = {
+            publicKey: "TU_PUBLIC_KEY", serviceID: "TU_SERVICE_ID", templateID: "TU_TEMPLATE_ID",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const questions = [
+            { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 }, { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 },
+            { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 }, { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 },
+            { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 }, { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 },
+            { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 }, { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 },
+            { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 }, { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 },
+            { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 }, { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 },
+            { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 }, { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 },
+            { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 }, { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 },
+        ];
+        const options = [
+            { text: "Totalmente en Desacuerdo", value: -2 }, { text: "En Desacuerdo", value: -1 }, { text: "Neutral", value: 0 },
+            { text: "De Acuerdo", value: 1 }, { text: "Totalmente de Acuerdo", value: 2 }
+        ];
+
+        const containers = {
+            welcome: document.getElementById('welcome-container'), registration: document.getElementById('registration-container'), quiz: document.getElementById('quiz-container'),
+            thankYou: document.getElementById('thank-you-container'), adminLogin: document.getElementById('admin-login-container'), report: document.getElementById('report-container'),
+            reportModal: document.getElementById('report-modal'),
+        };
+        const confirmationContainer = document.getElementById('confirmation-container');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        let currentQuestionIndex = 0, currentUser = {}, scores = {}, allResultsCache = [], tempSelectedValue = null;
+
+        function showScreen(screenName) {
+            Object.values(containers).forEach(c => c.classList.add('hidden'));
+            if (containers[screenName]) containers[screenName].classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('start-test-btn').addEventListener('click', () => showScreen('registration'));
+            document.getElementById('view-report-btn').addEventListener('click', () => showScreen('adminLogin'));
+            document.getElementById('registration-form').addEventListener('submit', e => {
+                e.preventDefault();
+                currentUser.name = document.getElementById('nombre').value;
+                currentUser.id = document.getElementById('cedula').value;
+                startQuiz();
+            });
+            document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
+            document.getElementById('admin-back-btn').addEventListener('click', () => showScreen('welcome'));
+            document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen('welcome'));
+            document.getElementById('report-back-btn').addEventListener('click', () => showScreen('welcome'));
+            confirmBtn.addEventListener('click', confirmAnswer);
+            nextBtn.addEventListener('click', processAndGoToNext);
+        });
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            scores = { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 };
+            showQuestion();
+            showScreen('quiz');
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            document.getElementById('question-text').textContent = question.text;
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            tempSelectedValue = null;
+            confirmationContainer.classList.add('hidden');
+            nextBtn.disabled = true;
+            confirmBtn.classList.remove('hidden');
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('option-btn');
+                button.onclick = () => handleOptionClick(option.value, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleOptionClick(value, clickedButton) {
+            document.querySelectorAll('#options-container .option-btn').forEach(btn => btn.classList.remove('selected'));
+            clickedButton.classList.add('selected');
+            tempSelectedValue = value;
+            confirmationContainer.classList.remove('hidden');
+        }
+
+        function confirmAnswer() {
+            if (tempSelectedValue === null) return;
+            document.querySelectorAll('#options-container .option-btn').forEach(btn => {
+                btn.onclick = null;
+                btn.style.cursor = 'not-allowed';
+            });
+            nextBtn.disabled = false;
+            confirmBtn.classList.add('hidden');
+        }
+
+        function processAndGoToNext() {
+            const question = questions[currentQuestionIndex];
+            scores[question.dimension] += tempSelectedValue * (question.score || 1);
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        async function finishQuiz() {
+            document.getElementById('options-container').classList.add('hidden');
+            document.getElementById('quiz-loader').classList.remove('hidden');
+            const finalResult = { ...currentUser, scores, createdAt: serverTimestamp() };
+            try {
+                await addDoc(collection(db, "farmaNovaResults"), finalResult);
+                const templateParams = { candidate_name: currentUser.name };
+                await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, emailJSConfig.publicKey);
+                showScreen('thankYou');
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Ocurrió un error al guardar tu prueba.");
+            } finally {
+                document.getElementById('options-container').classList.remove('hidden');
+                document.getElementById('quiz-loader').classList.add('hidden');
+            }
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorEl = document.getElementById('admin-error');
+            if (user === 'ADMIN' && pass === '9999') {
+                errorEl.classList.add('hidden');
+                showScreen('report');
+                await loadReports();
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        async function loadReports() {
+            const reportLoader = document.getElementById('report-loader');
+            const reportContent = document.getElementById('report-content');
+            reportLoader.classList.remove('hidden');
+            reportContent.classList.add('hidden');
+            try {
+                const q = query(collection(db, "farmaNovaResults"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                allResultsCache = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+                const tableBody = document.getElementById('report-table-body');
+                const noReportsMsg = document.getElementById('no-reports');
+                tableBody.innerHTML = '';
+                if (allResultsCache.length === 0) {
+                    noReportsMsg.classList.remove('hidden');
+                } else {
+                    noReportsMsg.classList.add('hidden');
+                    allResultsCache.forEach(result => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td class="py-4 px-4 whitespace-nowrap">${result.name}</td><td class="py-4 px-4 whitespace-nowrap">${result.id}</td><td class="py-4 px-4 whitespace-nowrap">${result.createdAt.toDate().toLocaleString('es-CO')}</td><td class="py-4 px-4 whitespace-nowrap"><button class="text-blue-600 hover:underline font-semibold" data-doc-id="${result.docId}">Ver Reporte</button></td>`;
+                        tableBody.appendChild(row);
+                    });
+                    tableBody.querySelectorAll('button').forEach(button => {
+                        button.addEventListener('click', (e) => showDetailedReport(e.target.dataset.docId));
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("No se pudieron cargar los reportes.");
+            } finally {
+                reportLoader.classList.add('hidden');
+                reportContent.classList.remove('hidden');
+            }
+        }
+        
+        function showDetailedReport(docId) {
+            const result = allResultsCache.find(r => r.docId === docId);
+            if (!result) return;
+            const maxScore = 8, maxLieScore = 4;
+            const r = (result.scores.responsabilidad / maxScore), s = (result.scores.sociabilidad / maxScore), e = (result.scores.estabilidad / maxScore), a = (result.scores.apertura / maxScore);
+            const personalityScore = ((r * 0.3) + (s * 0.3) + (e * 0.2) + (a * 0.2)) * 10;
+            const liePenalty = (result.scores.mentira / maxLieScore) * 10;
+            let viability = Math.max(0, Math.min(10, personalityScore - liePenalty));
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div><h3 class="text-2xl font-bold">${result.name}</h3><p class="text-gray-500">C.C. ${result.id}</p></div>
+                    <button id="close-modal-btn" class="text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
+                </div>
+                <div class="mt-6 border-t pt-6">
+                    <h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -8 a 8)</h4>
+                    <div class="space-y-3"><p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p><p><strong>Sociabilidad:</strong> ${result.scores.sociabilidad}</p><p><strong>Estabilidad Emocional:</strong> ${result.scores.estabilidad}</p><p><strong>Apertura al Cambio:</strong> ${result.scores.apertura}</p></div>
+                    <h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Contradicción</h4>
+                    <p class="${result.scores.mentira > 2 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -4 a 4) - ${result.scores.mentira > 2 ? 'Respuestas socialmente deseables detectadas.' : 'Respuestas consistentes.'}</p>
+                </div>
+                <div class="mt-8 bg-gray-50 p-6 rounded-lg text-center">
+                    <h4 class="text-lg font-semibold">Concepto General</h4>
+                    <p class="text-5xl font-extrabold ${viability < 4 ? 'text-red-500' : viability < 7 ? 'text-yellow-500' : 'text-green-600'} mt-2">${viability.toFixed(1)} / 10</p>
+                    <p class="text-sm text-gray-600 mt-1">Viabilidad de Contratación</p>
+                </div>`;
+            document.getElementById('close-modal-btn').addEventListener('click', () => containers.reportModal.classList.add('hidden'));
+            containers.reportModal.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+
