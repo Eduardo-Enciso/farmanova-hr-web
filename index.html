@@ -141,7 +141,12 @@
         </div>
 
         <div id="quiz-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
-            <div class="mb-6"><div class="w-full bg-gray-200 rounded-full h-2.5"><div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div></div>
+            <div class="mb-2">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            <p id="question-counter" class="text-center text-gray-500 text-sm mb-4"></p>
             <h3 id="question-text" class="text-2xl font-bold text-gray-800 text-center min-h-[96px]"></h3>
             <div id="options-container" class="mt-8 grid grid-cols-1 sm:grid-cols-5 gap-2"></div>
             <div id="quiz-loader" class="hidden loader"></div>
@@ -215,20 +220,60 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const questions = [
-            { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 }, { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 },
-            { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 }, { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 },
-            { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 }, { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 },
-            { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 }, { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 },
-            { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 }, { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 },
-            { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 }, { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 },
-            { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 }, { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 },
-            { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 }, { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 },
+        const allQuestions = [
+            // Responsabilidad (8)
+            { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 },
+            { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 },
+            { text: "Planifico mis actividades con antelación.", dimension: "responsabilidad", score: 1 },
+            { text: "Termino lo que empiezo, incluso si es difícil.", dimension: "responsabilidad", score: 1 },
+            { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 },
+            { text: "Suelo dejar las cosas desordenadas.", dimension: "responsabilidad", score: -1 },
+            { text: "Me distraigo con facilidad de mis tareas.", dimension: "responsabilidad", score: -1 },
+            { text: "A menudo olvido pequeños detalles importantes.", dimension: "responsabilidad", score: -1 },
+            // Sociabilidad (8)
+            { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 },
+            { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 },
+            { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 },
+            { text: "Soy una persona conversadora y animada en las reuniones.", dimension: "sociabilidad", score: 1 },
+            { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 },
+            { text: "Prefiero escuchar a hablar en las conversaciones grupales.", dimension: "sociabilidad", score: -1 },
+            { text: "Evito las multitudes siempre que puedo.", dimension: "sociabilidad", score: -1 },
+            { text: "Después de un evento social, necesito tiempo a solas para recargarme.", dimension: "sociabilidad", score: -1 },
+            // Estabilidad Emocional (8)
+            { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 },
+            { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 },
+            { text: "Generalmente me siento relajado/a.", dimension: "estabilidad", score: 1 },
+            { text: "Mi estado de ánimo es bastante estable.", dimension: "estabilidad", score: 1 },
+            { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 },
+            { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 },
+            { text: "Me irrito con facilidad.", dimension: "estabilidad", score: -1 },
+            { text: "Suelo pensar en lo peor que podría pasar.", dimension: "estabilidad", score: -1 },
+            // Apertura al Cambio (8)
+            { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 },
+            { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 },
+            { text: "Tengo una imaginación muy activa.", dimension: "apertura", score: 1 },
+            { text: "Disfruto de las sorpresas y la espontaneidad.", dimension: "apertura", score: 1 },
+            { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 },
+            { text: "No me gusta el cambio, prefiero lo familiar.", dimension: "apertura", score: -1 },
+            { text: "Prefiero las cosas concretas a las ideas abstractas.", dimension: "apertura", score: -1 },
+            { text: "Me siento incómodo/a cuando se altera mi rutina.", dimension: "apertura", score: -1 },
+            // Mentira / Coherencia (8)
+            { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 },
+            { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 },
+            { text: "Nunca he dicho una mentira, ni siquiera una pequeña.", dimension: "mentira", score: 1 },
+            { text: "Siempre estoy de buen humor.", dimension: "mentira", score: 1 },
+            { text: "Todas mis costumbres son buenas y deseables.", dimension: "mentira", score: 1 },
+            { text: "Nunca me he aprovechado de alguien para salir ganando.", dimension: "mentira", score: 1 },
+            { text: "Siempre escucho atentamente, incluso a personas que no me interesan.", dimension: "mentira", score: 1 },
+            { text: "Nunca he sentido la tentación de hacer algo incorrecto.", dimension: "mentira", score: 1 }
         ];
+
         const options = [
             { text: "Totalmente en Desacuerdo", value: -2 }, { text: "En Desacuerdo", value: -1 }, { text: "Neutral", value: 0 },
             { text: "De Acuerdo", value: 1 }, { text: "Totalmente de Acuerdo", value: 2 }
         ];
+
+        let questions = [];
 
         const containers = {
             welcome: document.getElementById('welcome-container'), registration: document.getElementById('registration-container'), quiz: document.getElementById('quiz-container'),
@@ -244,6 +289,14 @@
         function showScreen(screenName) {
             Object.values(containers).forEach(c => c.classList.add('hidden'));
             if (containers[screenName]) containers[screenName].classList.remove('hidden');
+        }
+        
+        // Función para barajar las preguntas
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -266,6 +319,8 @@
         function startQuiz() {
             currentQuestionIndex = 0;
             scores = { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 };
+            questions = [...allQuestions]; // Copia para no modificar el original
+            shuffleArray(questions); // Baraja las preguntas al iniciar
             showQuestion();
             showScreen('quiz');
         }
@@ -273,6 +328,7 @@
         function showQuestion() {
             const question = questions[currentQuestionIndex];
             document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            document.getElementById('question-counter').textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
             document.getElementById('question-text').textContent = question.text;
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
@@ -416,8 +472,9 @@
                     low: "Baja. Prefiere la rutina y los métodos establecidos, puede resistirse al cambio."
                 }
             };
-            if (score > 3) return descriptions[dimension].high;
-            if (score >= -3) return descriptions[dimension].mid;
+            // Umbrales ajustados para un rango de -16 a 16
+            if (score > 6) return descriptions[dimension].high;
+            if (score >= -6) return descriptions[dimension].mid;
             return descriptions[dimension].low;
         }
 
@@ -425,19 +482,20 @@
             const result = allResultsCache.find(r => r.docId === docId);
             if (!result) return;
 
-            // --- LÓGICA DE EVALUACIÓN MEJORADA ---
-            const maxScore = 8;
+            // --- LÓGICA DE EVALUACIÓN AJUSTADA PARA 40 PREGUNTAS ---
+            const maxScore = 16; // 8 preguntas por dimensión * 2 puntos max
             const r = result.scores.responsabilidad / maxScore;
             const s = result.scores.sociabilidad / maxScore;
             const e = result.scores.estabilidad / maxScore;
             const a = result.scores.apertura / maxScore;
 
-            const weightedAvg = (r * 0.3) + (s * 0.3) + (e * 0.2) + (a * 0.2);
+            const weightedAvg = (r * 0.4) + (s * 0.2) + (e * 0.2) + (a * 0.2); // Mayor peso a responsabilidad
             const personalityScore = (weightedAvg + 1) / 2 * 10;
 
             let liePenalty = 0;
-            if (result.scores.mentira >= 3) {
-                liePenalty = (result.scores.mentira - 2) * 2;
+            // Penalización más ajustada para un rango de -16 a 16
+            if (result.scores.mentira > 8) { // Umbral más alto
+                liePenalty = (result.scores.mentira - 8) * 0.75; // Penalización más gradual
             }
 
             let viability = personalityScore - liePenalty;
@@ -450,7 +508,7 @@
                     <button id="close-modal-btn" class="text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
                 </div>
                 <div class="mt-6 border-t pt-6">
-                    <h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -8 a 8)</h4>
+                    <h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -16 a 16)</h4>
                     <div class="space-y-4">
                         <div>
                             <p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p>
@@ -469,12 +527,12 @@
                             <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('apertura', result.scores.apertura)}</p>
                         </div>
                     </div>
-                    <h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Contradicción</h4>
-                    <p class="${result.scores.mentira > 2 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -4 a 4) - ${result.scores.mentira > 2 ? 'Respuestas socialmente deseables detectadas.' : 'Respuestas consistentes.'}</p>
+                    <h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Coherencia</h4>
+                    <p class="${result.scores.mentira > 8 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -16 a 16) - ${result.scores.mentira > 8 ? 'Posible tendencia a dar respuestas socialmente deseables.' : 'Respuestas consistentes.'}</p>
                 </div>
                 <div class="mt-8 bg-gray-50 p-6 rounded-lg text-center">
                     <h4 class="text-lg font-semibold">Concepto General</h4>
-                    <p class="text-5xl font-extrabold ${viability < 4 ? 'text-red-500' : viability < 7 ? 'text-yellow-500' : 'text-green-600'} mt-2">${viability.toFixed(1)} / 10</p>
+                    <p class="text-5xl font-extrabold ${viability < 5 ? 'text-red-500' : viability > 7 ? 'text-green-600' : 'text-yellow-500'} mt-2">${viability.toFixed(1)} / 10</p>
                     <p class="text-sm text-gray-600 mt-1">Viabilidad de Contratación</p>
                 </div>`;
             document.getElementById('close-modal-btn').addEventListener('click', () => containers.reportModal.classList.add('hidden'));
