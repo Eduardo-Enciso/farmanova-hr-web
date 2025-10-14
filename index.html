@@ -321,19 +321,33 @@
             document.getElementById('options-container').classList.add('hidden');
             document.getElementById('quiz-loader').classList.remove('hidden');
             const finalResult = { ...currentUser, scores, createdAt: serverTimestamp() };
+            
+            // Intenta guardar en Firebase
             try {
                 await addDoc(collection(db, "farmaNovaResults"), finalResult);
+            } catch (error) {
+                console.error("Error al guardar en Firestore:", error);
+                alert(`Error CRÍTICO al guardar en la base de datos: ${error.message}. Por favor, avisa al administrador.`);
+                document.getElementById('quiz-loader').classList.add('hidden');
+                document.getElementById('options-container').classList.remove('hidden');
+                return; // Detiene la ejecución si falla Firebase
+            }
+
+            // Intenta enviar el correo
+            try {
                 const templateParams = { candidate_name: currentUser.name };
                 await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, { publicKey: emailJSConfig.publicKey });
-                showScreen('thankYou');
             } catch (error) {
-                console.error("Error:", error);
-                alert("Ocurrió un error al guardar tu prueba.");
-            } finally {
-                document.getElementById('options-container').classList.remove('hidden');
-                document.getElementById('quiz-loader').classList.add('hidden');
+                console.warn("La prueba se guardó correctamente, pero falló el envío de la notificación por email.", error);
+                // No se notifica al usuario de este error, ya que no es crítico.
             }
+            
+            // Si todo (o al menos Firebase) funcionó, muestra la pantalla de agradecimiento.
+            showScreen('thankYou');
+            document.getElementById('quiz-loader').classList.add('hidden');
+            document.getElementById('options-container').classList.remove('hidden');
         }
+
 
         async function handleAdminLogin(e) {
             e.preventDefault();
