@@ -6,9 +6,11 @@
     <title>Prueba de Personalidad - Droguería Farma Nova</title>
     <meta name="description" content="Plataforma para la realización de pruebas de personalidad psicométricas para candidatos de Droguería Farma Nova.">
     
-    <!-- Optimización de Carga de Fuentes -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Optimización de Carga de Recursos Críticos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preload" href="assets/logo-farma-nova.webp" as="image">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 
@@ -17,114 +19,96 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" defer></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .btn {
+        /* Estilos iniciales para prevenir FOUC (Flash of Unstyled Content) */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f3f4f6; /* Coincide con bg-gray-100 */
+        }
+
+        /* --- SOLUCIÓN: INICIO --- */
+        /* 1. Ocultar el contenedor principal para evitar saltos visuales (CLS) */
+        #app-container {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* 2. Estilos para el spinner de carga inicial */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            font-size: 1.125rem;
-            line-height: 1.75rem;
-            font-weight: 700;
-            color: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            transition-property: all;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 300ms;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-        }
-        .btn:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-        }
-        .btn-primary {
-            background-color: #2563eb;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
-         .btn-primary:focus {
-            --tw-ring-color: #3b82f6;
-             box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color);
-        }
-        .btn-secondary {
-            background-color: #4f46e5;
-        }
-        .btn-secondary:hover {
-            background-color: #4338ca;
-        }
-        .btn-secondary:focus {
-            --tw-ring-color: #6366f1;
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color);
-        }
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background-color: #f9fafb;
-            border-width: 2px;
-            border-color: #e5e7eb;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            color: #111827;
-            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        }
-        .form-input:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px #3b82f6;
-        }
-        .hidden { display: none; }
-        .option-btn {
-            width: 100%;
-            text-align: center;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-width: 2px;
-            border-color: #d1d5db;
-            border-radius: 0.5rem;
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 200ms;
-            cursor: pointer;
-        }
-        .option-btn:hover {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background-color: #f3f4f6;
-            border-color: #3b82f6;
+            z-index: 9999;
+            transition: opacity 0.3s ease-in-out;
         }
-        .option-btn.selected {
-            background-color: #dbeafe;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px #3b82f6;
-        }
+
         .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border: 5px solid #e5e7eb; /* gray-200 */
+            border-top: 5px solid #3b82f6; /* blue-600 */
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* --- SOLUCIÓN: FIN --- */
+
+        /* Clases de utilidad que se usarán frecuentemente */
+        .hidden { display: none !important; }
+
+        /* Estilos de botones y formularios (optimizados) */
+        .btn {
+            width: 100%; padding: 0.75rem 1.5rem; font-size: 1.125rem; font-weight: 700; color: #fff;
+            border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow); }
+        .btn-primary { background-color: #2563eb; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-primary:focus { --tw-ring-color: #3b82f6; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color); }
+        .btn-secondary { background-color: #4f46e5; }
+        .btn-secondary:hover { background-color: #4338ca; }
+        .btn-secondary:focus { --tw-ring-color: #6366f1; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--tw-ring-color); }
+
+        .form-input {
+            width: 100%; padding: 0.75rem 1rem; background-color: #f9fafb; border: 2px solid #e5e7eb;
+            border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); color: #111827;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .form-input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #3b82f6; box-shadow: 0 0 0 2px #3b82f6; }
+        
+        .option-btn {
+            width: 100%; text-align: center; padding: 0.75rem; margin-top: 0.5rem; margin-bottom: 0.5rem;
+            border: 2px solid #d1d5db; border-radius: 0.5rem;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+        }
+        .option-btn:hover { background-color: #f3f4f6; border-color: #60a5fa; }
+        .option-btn.selected { background-color: #dbeafe; border-color: #2563eb; color: #1e40af; font-weight: 600; transform: scale(1.02); }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- SOLUCIÓN: Spinner de carga visible al inicio -->
+    <div id="loader-wrapper" class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
 
     <div id="app-container" class="w-full max-w-2xl mx-auto">
-
         <!-- Pantallas y Lógica de la App -->
-        <div id="welcome-container" class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
-            <img src="assets/logo-farma-nova.webp" alt="Logo Farma Nova" class="mx-auto mb-6 h-14">
+        <div id="welcome-container" class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center hidden">
+            <!-- SOLUCIÓN: Se añaden width y height para evitar el salto de la imagen -->
+            <img src="assets/logo-farma-nova.webp" alt="Logo Farma Nova" class="mx-auto mb-6" width="224" height="56" fetchpriority="high">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-600">Droguería Farma Nova</h1>
             <p class="text-xl text-gray-600 mt-2">Gestión Humana</p>
             <div class="mt-10 space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
@@ -166,10 +150,13 @@
                 <button id="confirm-btn" class="px-6 py-2 text-base font-bold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Confirmar</button>
                 <button id="next-btn" class="px-6 py-2 text-base font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" disabled>Siguiente</button>
             </div>
-            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end"><img src="assets/logo-farma-nova-footer.webp" alt="Logo Farma Nova" class="h-8"></div>
+            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end">
+                <img src="assets/logo-farma-nova-footer.webp" alt="Logo Farma Nova" class="h-8" width="150" height="32">
+            </div>
         </div>
 
         <div id="thank-you-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
+            <img src="assets/logo-farma-nova.webp" alt="Logo Farma Nova" class="mx-auto mb-6" width="224" height="56">
             <h2 class="text-3xl font-bold text-gray-800">¡Has finalizado!</h2>
             <p class="text-gray-600 mt-4">Agradecemos sinceramente tu tiempo y honestidad. Hemos recibido tus respuestas.</p>
             <p class="text-gray-600 mt-2">Pronto serás contactado/a para conocer la conclusión de este proceso de selección.</p>
@@ -200,7 +187,7 @@
             <div id="report-container" class="mt-6">
                 <div id="report-loader" class="loader"></div>
                 <div id="report-content" class="hidden overflow-x-auto">
-                    <table class="min-w-full bg-white"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Fecha y Hora</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Acción</th></tr></thead><tbody id="report-table-body" class="divide-y divide-gray-200"></tbody></table>
+                    <table class="min-w-full bg-white table-fixed w-full"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase w-[35%]">Nombre</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase w-[20%]">Cédula</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase w-[30%]">Fecha y Hora</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase w-auto">Acción</th></tr></thead><tbody id="report-table-body" class="divide-y divide-gray-200"></tbody></table>
                     <p id="no-reports" class="text-center text-gray-500 mt-8 hidden">Aún no se han completado pruebas.</p>
                 </div>
             </div>
@@ -220,10 +207,10 @@
     </div>
 
     <!-- SDK de Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+    
+    <script defer>
         const firebaseConfig = {
             apiKey: "AIzaSyChvJf2ifEgSFCXlc0cmYvtdz3lNzuso_I",
             authDomain: "farmanova-hr-web.firebaseapp.com",
@@ -238,9 +225,10 @@
             serviceID: "service_o6ssw7j", 
             templateID: "template_lh6n0oo",
         };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        
+        // Se inicializa Firebase usando la API de compatibilidad (global)
+        // La inicialización se moverá a un listener para asegurar que el SDK esté cargado.
+        let db;
 
         const allQuestions = [
             { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 }, { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 }, { text: "Planifico mis actividades con antelación.", dimension: "responsabilidad", score: 1 }, { text: "Termino lo que empiezo, incluso si es difícil.", dimension: "responsabilidad", score: 1 }, { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 }, { text: "Suelo dejar las cosas desordenadas.", dimension: "responsabilidad", score: -1 }, { text: "Me distraigo con facilidad de mis tareas.", dimension: "responsabilidad", score: -1 }, { text: "A menudo olvido pequeños detalles importantes.", dimension: "responsabilidad", score: -1 }, { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 }, { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 }, { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 }, { text: "Soy una persona conversadora y animada en las reuniones.", dimension: "sociabilidad", score: 1 }, { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 }, { text: "Prefiero escuchar a hablar en las conversaciones grupales.", dimension: "sociabilidad", score: -1 }, { text: "Evito las multitudes siempre que puedo.", dimension: "sociabilidad", score: -1 }, { text: "Después de un evento social, necesito tiempo a solas para recargarme.", dimension: "sociabilidad", score: -1 }, { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 }, { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 }, { text: "Generalmente me siento relajado/a.", dimension: "estabilidad", score: 1 }, { text: "Mi estado de ánimo es bastante estable.", dimension: "estabilidad", score: 1 }, { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 }, { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 }, { text: "Me irrito con facilidad.", dimension: "estabilidad", score: -1 }, { text: "Suelo pensar en lo peor que podría pasar.", dimension: "estabilidad", score: -1 }, { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 }, { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 }, { text: "Tengo una imaginación muy activa.", dimension: "apertura", score: 1 }, { text: "Disfruto de las sorpresas y la espontaneidad.", dimension: "apertura", score: 1 }, { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 }, { text: "No me gusta el cambio, prefiero lo familiar.", dimension: "apertura", score: -1 }, { text: "Prefiero las cosas concretas a las ideas abstractas.", dimension: "apertura", score: -1 }, { text: "Me siento incómodo/a cuando se altera mi rutina.", dimension: "apertura", score: -1 }, { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 }, { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 }, { text: "Nunca he dicho una mentira, ni siquiera una pequeña.", dimension: "mentira", score: 1 }, { text: "Siempre estoy de buen humor.", dimension: "mentira", score: 1 }, { text: "Todas mis costumbres son buenas y deseables.", dimension: "mentira", score: 1 }, { text: "Nunca me he aprovechado de alguien para salir ganando.", dimension: "mentira", score: 1 }, { text: "Siempre escucho atentamente, incluso a personas que no me interesan.", dimension: "mentira", score: 1 }, { text: "Nunca he sentido la tentación de hacer algo incorrecto.", dimension: "mentira", score: 1 }
@@ -260,9 +248,35 @@
             Object.values(containers).forEach(c => c.classList.add('hidden'));
             if (containers[screenName]) containers[screenName].classList.remove('hidden');
         }
+
         function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 
+        // --- SOLUCIÓN: Ejecutar código cuando el DOM esté listo ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar Firebase
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+
+            // Referencias a elementos de la UI
+            const loaderWrapper = document.getElementById('loader-wrapper');
+            const appContainer = document.getElementById('app-container');
+
+            // Lógica de transición suave
+            setTimeout(() => {
+                loaderWrapper.style.opacity = '0';
+                appContainer.style.visibility = 'visible';
+                appContainer.style.opacity = '1';
+
+                // Ocultar el loader completamente después de la transición
+                loaderWrapper.addEventListener('transitionend', () => {
+                    loaderWrapper.classList.add('hidden');
+                });
+                
+                // Mostrar la pantalla de bienvenida
+                showScreen('welcome');
+            }, 500); // Un pequeño retraso para simular carga y mejorar la UX
+
+            // Asignar eventos a los botones
             document.getElementById('start-test-btn').addEventListener('click', () => showScreen('accessCode'));
             document.getElementById('view-report-btn').addEventListener('click', () => showScreen('adminLogin'));
             document.getElementById('access-code-form').addEventListener('submit', handleAccessCodeSubmit);
@@ -287,8 +301,7 @@
             errorEl.classList.add('hidden');
             if (!code) return;
 
-            const q = query(collection(db, "accessCodes"), where("code", "==", code));
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await db.collection("accessCodes").where("code", "==", code).get();
 
             if (querySnapshot.empty) {
                 errorEl.textContent = "El código ingresado no es válido.";
@@ -303,8 +316,8 @@
                 errorEl.textContent = "Este código ya fue utilizado.";
                 errorEl.classList.remove('hidden');
             } else if (currentAccessCode.status === 'in-progress') {
-                const resultDoc = await getDoc(doc(db, "farmaNovaResults", currentAccessCode.resultId));
-                if (resultDoc.exists()) {
+                const resultDoc = await db.collection("farmaNovaResults").doc(currentAccessCode.resultId).get();
+                if (resultDoc.exists) {
                     const resultData = resultDoc.data();
                     currentUser = { name: resultData.name, id: resultData.id };
                     scores = resultData.scores;
@@ -322,11 +335,11 @@
             currentUser.name = document.getElementById('nombre').value;
             currentUser.id = document.getElementById('cedula').value;
             
-            const newResult = { ...currentUser, scores: { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 }, status: 'in-progress', currentQuestionIndex: 0, createdAt: serverTimestamp() };
-            const resultDocRef = await addDoc(collection(db, "farmaNovaResults"), newResult);
+            const newResult = { ...currentUser, scores: { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 }, status: 'in-progress', currentQuestionIndex: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            const resultDocRef = await db.collection("farmaNovaResults").add(newResult);
             currentResultDocId = resultDocRef.id;
 
-            await updateDoc(doc(db, "accessCodes", currentAccessCode.id), {
+            await db.collection("accessCodes").doc(currentAccessCode.id).update({
                 status: 'in-progress',
                 resultId: currentResultDocId
             });
@@ -366,14 +379,14 @@
         function handleOptionClick(value, clickedButton) { document.querySelectorAll('#options-container .option-btn').forEach(btn => btn.classList.remove('selected')); clickedButton.classList.add('selected'); tempSelectedValue = value; confirmationContainer.classList.remove('hidden'); }
         function confirmAnswer() { if (tempSelectedValue === null) return; document.querySelectorAll('#options-container .option-btn').forEach(btn => { btn.onclick = null; btn.style.cursor = 'not-allowed'; }); nextBtn.disabled = false; confirmBtn.classList.add('hidden'); }
         async function processAndGoToNext() { const question = questions[currentQuestionIndex]; scores[question.dimension] += tempSelectedValue * (question.score || 1); currentQuestionIndex++; await saveProgress(); if (currentQuestionIndex < questions.length) { showQuestion(); } else { finishQuiz(); } }
-        async function saveProgress() { if (!currentResultDocId) return; await updateDoc(doc(db, "farmaNovaResults", currentResultDocId), { scores, currentQuestionIndex }); }
+        async function saveProgress() { if (!currentResultDocId) return; await db.collection("farmaNovaResults").doc(currentResultDocId).update({ scores, currentQuestionIndex }); }
 
         async function finishQuiz() {
             document.getElementById('options-container').classList.add('hidden');
             document.getElementById('quiz-loader').classList.remove('hidden');
             
-            await updateDoc(doc(db, "farmaNovaResults", currentResultDocId), { status: 'completed' });
-            await updateDoc(doc(db, "accessCodes", currentAccessCode.id), { status: 'used' });
+            await db.collection("farmaNovaResults").doc(currentResultDocId).update({ status: 'completed' });
+            await db.collection("accessCodes").doc(currentAccessCode.id).update({ status: 'used' });
 
             try { await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, { candidate_name: currentUser.name }, { publicKey: emailJSConfig.publicKey }); } catch (error) { console.warn("Fallo el envío de email.", error); }
             
@@ -423,8 +436,7 @@
                 const year = new Date().getFullYear().toString();
                 const startOfYear = year + "000";
                 
-                const q = query(collection(db, "accessCodes"), where("code", ">", startOfYear), orderBy("code", "desc"));
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await db.collection("accessCodes").where("code", ">=", startOfYear).orderBy("code", "desc").limit(1).get();
 
                 let lastConsecutive = 0;
                 if (!querySnapshot.empty) {
@@ -436,9 +448,9 @@
                 
                 const newConsecutive = lastConsecutive + 1;
                 const newCode = year + newConsecutive.toString().padStart(3, '0');
-                const newCodeData = { code: newCode, status: 'unused', createdAt: serverTimestamp() };
+                const newCodeData = { code: newCode, status: 'unused', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
                 
-                await addDoc(collection(db, "accessCodes"), newCodeData);
+                await db.collection("accessCodes").add(newCodeData);
                 
                 displayEl.textContent = `Nuevo Código Generado: ${newCode}`;
                 loadAccessCodes();
@@ -456,8 +468,7 @@
             const content = document.getElementById('code-content');
             loader.classList.remove('hidden'); content.classList.add('hidden');
             try {
-                const q = query(collection(db, "accessCodes"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await db.collection("accessCodes").orderBy("createdAt", "desc").get();
                 const codes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 const tableBody = document.getElementById('code-table-body');
                 const noCodesMsg = document.getElementById('no-codes');
@@ -474,24 +485,37 @@
         }
 
         async function loadReports() {
-            const reportLoader = document.getElementById('report-loader'); const reportContent = document.getElementById('report-content');
-            reportLoader.classList.remove('hidden'); reportContent.classList.add('hidden');
+            const reportLoader = document.getElementById('report-loader');
+            const reportContent = document.getElementById('report-content');
+            reportLoader.classList.remove('hidden');
+            reportContent.classList.add('hidden');
             try {
-                const q = query(collection(db, "farmaNovaResults"), where("status", "==", "completed"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                allResultsCache = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-                const tableBody = document.getElementById('report-table-body'); const noReportsMsg = document.getElementById('no-reports');
+                const querySnapshot = await db.collection("farmaNovaResults").where("status", "==", "completed").orderBy("createdAt", "desc").get();
+                let results = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+                
+                allResultsCache = results;
+
+                const tableBody = document.getElementById('report-table-body');
+                const noReportsMsg = document.getElementById('no-reports');
                 tableBody.innerHTML = '';
-                if (allResultsCache.length === 0) { noReportsMsg.classList.remove('hidden'); } else {
+                if (allResultsCache.length === 0) {
+                    noReportsMsg.classList.remove('hidden');
+                } else {
                     noReportsMsg.classList.add('hidden');
                     allResultsCache.forEach(result => {
                         const row = document.createElement('tr');
-                        row.innerHTML = `<td class="py-4 px-4 whitespace-nowrap">${result.name}</td><td class="py-4 px-4 whitespace-nowrap">${result.id}</td><td class="py-4 px-4 whitespace-nowrap">${result.createdAt.toDate().toLocaleString('es-CO')}</td><td class="py-4 px-4 whitespace-nowrap"><button class="text-blue-600 hover:underline font-semibold" data-doc-id="${result.docId}">Ver Reporte</button></td>`;
+                        row.innerHTML = `<td class="py-4 px-4 break-words">${result.name}</td><td class="py-4 px-4">${result.id}</td><td class="py-4 px-4">${result.createdAt.toDate().toLocaleString('es-CO')}</td><td class="py-4 px-4"><button class="text-blue-600 hover:underline font-semibold" data-doc-id="${result.docId}">Ver Reporte</button></td>`;
                         tableBody.appendChild(row);
                     });
                     tableBody.querySelectorAll('button').forEach(button => button.addEventListener('click', (e) => showDetailedReport(e.target.dataset.docId)));
                 }
-            } catch (error) { console.error("Error:", error); alert("No se pudieron cargar los reportes."); } finally { reportLoader.classList.add('hidden'); reportContent.classList.remove('hidden'); }
+            } catch (error) {
+                console.error("Error al cargar reportes:", error);
+                alert("No se pudieron cargar los reportes. Podría ser un problema con los índices de Firebase. Revisa la consola para más detalles.");
+            } finally {
+                reportLoader.classList.add('hidden');
+                reportContent.classList.remove('hidden');
+            }
         }
         function getDimensionDescription(dimension, score) {
             const descriptions = {
@@ -515,6 +539,6 @@
             containers.reportModal.classList.remove('hidden');
         }
     </script>
+
 </body>
 </html>
-
