@@ -132,10 +132,7 @@
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-gray-800">Gracias por tu interés</h2>
                 <p class="text-gray-600 mt-4 max-w-lg mx-auto">A continuación, encontrarás una serie de afirmaciones. Por favor, responde con la mayor honestidad posible. Recuerda que no hay respuestas correctas o incorrectas.</p>
-                <div class="mt-4 max-w-lg mx-auto space-y-3">
-                    <p class="text-amber-800 bg-amber-100 p-3 rounded-lg border border-amber-200">Por favor, <strong>EVITE</strong> en lo posible la opción "Neutral". Si ninguna opción parece perfecta, elija la que más se aproxime a su sentir.</p>
-                    <p class="text-sky-800 bg-sky-100 p-3 rounded-lg border border-sky-200"><strong>Importante:</strong> Si la prueba se interrumpe, puede volver a ingresar con el mismo código para continuar donde quedó.</p>
-                </div>
+                <p class="text-amber-800 bg-amber-100 p-3 rounded-lg mt-4 max-w-lg mx-auto border border-amber-200">Por favor, <strong>EVITE</strong> en lo posible la opción "Neutral". Si ninguna opción parece perfecta, elija la que más se aproxime a su sentir.</p>
             </div>
             <form id="registration-form" class="mt-8 space-y-4">
                 <div><label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label><input type="text" id="nombre" class="form-input" required></div>
@@ -215,28 +212,20 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
     
     <script defer>
-        // --- CÓDIGO SEGURO: INICIO ---
-        // Las configuraciones sensibles se leen desde variables de entorno
-        // en lugar de estar escritas directamente en el código.
-        const firebaseConfig = typeof __firebase_config__ !== 'undefined'
-            ? JSON.parse(__firebase_config__)
-            : {
-                apiKey: "API_KEY_PLACEHOLDER",
-                authDomain: "PROJECT_ID.firebaseapp.com",
-                projectId: "PROJECT_ID",
-                storageBucket: "PROJECT_ID.appspot.com",
-                messagingSenderId: "SENDER_ID",
-                appId: "APP_ID"
-              };
-
-        const emailJSConfig = typeof __emailjs_config__ !== 'undefined'
-            ? JSON.parse(__emailjs_config__)
-            : {
-                publicKey: "PUBLIC_KEY_PLACEHOLDER",
-                serviceID: "SERVICE_ID_PLACEHOLDER",
-                templateID: "TEMPLATE_ID_PLACEHOLDER"
-            };
-        // --- CÓDIGO SEGURO: FIN ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyChvJf2ifEgSFCXlc0cmYvtdz3lNzuso_I",
+            authDomain: "farmanova-hr-web.firebaseapp.com",
+            projectId: "farmanova-hr-web",
+            storageBucket: "farmanova-hr-web.appspot.com",
+            messagingSenderId: "463013400303",
+            appId: "1:463013400303:web:f6ab22192914938d40151a",
+            measurementId: "G-7V9DE5Y0YW"
+        };
+        const emailJSConfig = {
+            publicKey: "sLbTMJLSG8r-lb9n7", 
+            serviceID: "service_o6ssw7j", 
+            templateID: "template_lh6n0oo",
+        };
         
         let db;
 
@@ -269,11 +258,6 @@
         function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Verificar que la configuración de Firebase no sea un placeholder
-            if (firebaseConfig.apiKey === "API_KEY_PLACEHOLDER") {
-                document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: sans-serif;"><h1>Error de Configuración</h1><p>Las credenciales de Firebase no se han cargado correctamente. La aplicación no puede iniciarse.</p></div>';
-                return;
-            }
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
 
@@ -432,11 +416,7 @@
             await db.collection("farmaNovaResults").doc(currentResultDocId).update({ status: 'completed' });
             await db.collection("accessCodes").doc(currentAccessCode.id).update({ status: 'used' });
 
-            try { 
-                if (emailJSConfig.publicKey !== 'PUBLIC_KEY_PLACEHOLDER') {
-                    await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, { candidate_name: currentUser.name }, { publicKey: emailJSConfig.publicKey }); 
-                }
-            } catch (error) { console.warn("Fallo el envío de email.", error); }
+            try { await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, { candidate_name: currentUser.name }, { publicKey: emailJSConfig.publicKey }); } catch (error) { console.warn("Fallo el envío de email.", error); }
             
             showScreen('thankYou');
             document.getElementById('quiz-loader').classList.add('hidden');
