@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prueba de Personalidad - Droguería Farma Nova</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Plataforma para la realización de pruebas de personalidad psicométricas para candidatos de Droguería Farma Nova.">
     
-    <!-- SDK de EmailJS para notificaciones por correo -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Optimización de Carga de Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Scripts diferidos para no bloquear el renderizado -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" defer></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -118,7 +124,6 @@
 
         <!-- Pantallas y Lógica de la App -->
         <div id="welcome-container" class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
-            <!-- NOTA: Coloca tu logo en la carpeta 'assets' con este nombre de archivo -->
             <img src="assets/logo-farma-nova.webp" alt="Logo Farma Nova" class="mx-auto mb-6 h-14">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-600">Droguería Farma Nova</h1>
             <p class="text-xl text-gray-600 mt-2">Gestión Humana</p>
@@ -128,10 +133,21 @@
             </div>
         </div>
 
+        <div id="access-code-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <h2 class="text-3xl font-bold text-gray-800 text-center">Código de Acceso</h2>
+            <p class="text-gray-600 mt-4 text-center">Por favor, introduce el código único que te fue proporcionado.</p>
+            <form id="access-code-form" class="mt-8 space-y-4">
+                <div><label for="access-code" class="block text-sm font-medium text-gray-700 mb-1">Código de Acceso</label><input type="text" id="access-code" class="form-input" required></div>
+                <p id="access-code-error" class="text-red-500 text-sm text-center hidden"></p>
+                <button type="submit" class="!mt-8 btn btn-primary">Validar Código</button>
+                <button type="button" id="access-code-back-btn" class="!mt-4 w-full text-center py-2 text-gray-600 hover:text-black">Volver</button>
+            </form>
+        </div>
+
         <div id="registration-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-gray-800">Gracias por tu interés</h2>
-                <p class="text-gray-600 mt-4 max-w-lg mx-auto">A continuación, encontrarás una serie de afirmaciones. Por favor, responde con la mayor honestidad posible. Recuerda que no hay respuestas correctas o incorrectas. Queremos conocerte mejor.</p>
+                <p class="text-gray-600 mt-4 max-w-lg mx-auto">A continuación, encontrarás una serie de afirmaciones. Por favor, responde con la mayor honestidad posible. Recuerda que no hay respuestas correctas o incorrectas.</p>
             </div>
             <form id="registration-form" class="mt-8 space-y-4">
                 <div><label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label><input type="text" id="nombre" class="form-input" required></div>
@@ -141,25 +157,16 @@
         </div>
 
         <div id="quiz-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
-            <div class="mb-2">
-                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                </div>
-            </div>
+            <div class="mb-2"><div class="w-full bg-gray-200 rounded-full h-2.5"><div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div></div>
             <p id="question-counter" class="text-center text-gray-500 text-sm mb-4"></p>
             <h3 id="question-text" class="text-2xl font-bold text-gray-800 text-center min-h-[96px]"></h3>
             <div id="options-container" class="mt-8 grid grid-cols-1 sm:grid-cols-5 gap-2"></div>
             <div id="quiz-loader" class="hidden loader"></div>
-            
             <div id="confirmation-container" class="hidden mt-6 flex justify-end items-center space-x-4">
                 <button id="confirm-btn" class="px-6 py-2 text-base font-bold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Confirmar</button>
                 <button id="next-btn" class="px-6 py-2 text-base font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" disabled>Siguiente</button>
             </div>
-
-            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end">
-                 <!-- NOTA: Coloca tu logo para el pie de página en la carpeta 'assets' -->
-                <img src="assets/logo-farma-nova-footer.webp" alt="Logo Farma Nova" class="h-8">
-            </div>
+            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end"><img src="assets/logo-farma-nova-footer.webp" alt="Logo Farma Nova" class="h-8"></div>
         </div>
 
         <div id="thank-you-container" class="hidden bg-white p-8 sm:p-12 rounded-2xl shadow-xl text-center">
@@ -180,12 +187,32 @@
             </form>
         </div>
 
-        <div id="report-container" class="hidden w-full max-w-4xl bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
-            <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold text-gray-800">Reporte de Pruebas</h2><button id="report-back-btn" class="text-gray-600 hover:text-black">Volver al Inicio</button></div>
-            <div id="report-loader" class="loader"></div>
-            <div id="report-content" class="hidden overflow-x-auto">
-                <table class="min-w-full bg-white"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Fecha y Hora</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Acción</th></tr></thead><tbody id="report-table-body" class="divide-y divide-gray-200"></tbody></table>
-                <p id="no-reports" class="text-center text-gray-500 mt-8 hidden">Aún no se han completado pruebas.</p>
+        <div id="admin-panel-container" class="hidden w-full max-w-4xl bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 class="text-3xl font-bold text-gray-800">Panel de Administrador</h2>
+                <button id="admin-logout-btn" class="text-gray-600 hover:text-black">Salir</button>
+            </div>
+            <div class="flex border-b">
+                <button id="tab-results" class="py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600">Resultados</button>
+                <button id="tab-codes" class="py-2 px-4 font-semibold text-gray-500">Gestionar Códigos</button>
+            </div>
+            
+            <div id="report-container" class="mt-6">
+                <div id="report-loader" class="loader"></div>
+                <div id="report-content" class="hidden overflow-x-auto">
+                    <table class="min-w-full bg-white"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Fecha y Hora</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Acción</th></tr></thead><tbody id="report-table-body" class="divide-y divide-gray-200"></tbody></table>
+                    <p id="no-reports" class="text-center text-gray-500 mt-8 hidden">Aún no se han completado pruebas.</p>
+                </div>
+            </div>
+
+            <div id="code-manager-container" class="hidden mt-6">
+                <button id="generate-code-btn" class="btn btn-primary max-w-xs mx-auto mb-6">Generar Nuevo Código</button>
+                <p id="new-code-display" class="text-center text-lg font-bold text-green-600 mb-6 hidden"></p>
+                <div id="code-loader" class="loader hidden"></div>
+                <div id="code-content" class="overflow-x-auto">
+                    <table class="min-w-full bg-white"><thead class="bg-gray-50"><tr><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Código</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Estado</th><th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Fecha Creación</th></tr></thead><tbody id="code-table-body" class="divide-y divide-gray-200"></tbody></table>
+                    <p id="no-codes" class="text-center text-gray-500 mt-8 hidden">No se han generado códigos.</p>
+                </div>
             </div>
         </div>
 
@@ -194,11 +221,9 @@
 
     <!-- SDK de Firebase -->
     <script type="module">
-        // Se importa la función para inicializar Firebase y las funciones de Firestore
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Tu configuración de Firebase (reemplazada con tus datos)
         const firebaseConfig = {
             apiKey: "AIzaSyChvJf2ifEgSFCXlc0cmYvtdz3lNzuso_I",
             authDomain: "farmanova-hr-web.firebaseapp.com",
@@ -208,119 +233,113 @@
             appId: "1:463013400303:web:f6ab22192914938d40151a",
             measurementId: "G-7V9DE5Y0YW"
         };
-
-        // Configuración de EmailJS (reemplazada con tus datos)
         const emailJSConfig = {
             publicKey: "sLbTMJLSG8r-lb9n7", 
             serviceID: "service_o6ssw7j", 
             templateID: "template_lh6n0oo",
         };
 
-        // Se inicializa Firebase y Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const allQuestions = [
-            // Responsabilidad (8)
-            { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 },
-            { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 },
-            { text: "Planifico mis actividades con antelación.", dimension: "responsabilidad", score: 1 },
-            { text: "Termino lo que empiezo, incluso si es difícil.", dimension: "responsabilidad", score: 1 },
-            { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 },
-            { text: "Suelo dejar las cosas desordenadas.", dimension: "responsabilidad", score: -1 },
-            { text: "Me distraigo con facilidad de mis tareas.", dimension: "responsabilidad", score: -1 },
-            { text: "A menudo olvido pequeños detalles importantes.", dimension: "responsabilidad", score: -1 },
-            // Sociabilidad (8)
-            { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 },
-            { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 },
-            { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 },
-            { text: "Soy una persona conversadora y animada en las reuniones.", dimension: "sociabilidad", score: 1 },
-            { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 },
-            { text: "Prefiero escuchar a hablar en las conversaciones grupales.", dimension: "sociabilidad", score: -1 },
-            { text: "Evito las multitudes siempre que puedo.", dimension: "sociabilidad", score: -1 },
-            { text: "Después de un evento social, necesito tiempo a solas para recargarme.", dimension: "sociabilidad", score: -1 },
-            // Estabilidad Emocional (8)
-            { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 },
-            { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 },
-            { text: "Generalmente me siento relajado/a.", dimension: "estabilidad", score: 1 },
-            { text: "Mi estado de ánimo es bastante estable.", dimension: "estabilidad", score: 1 },
-            { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 },
-            { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 },
-            { text: "Me irrito con facilidad.", dimension: "estabilidad", score: -1 },
-            { text: "Suelo pensar en lo peor que podría pasar.", dimension: "estabilidad", score: -1 },
-            // Apertura al Cambio (8)
-            { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 },
-            { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 },
-            { text: "Tengo una imaginación muy activa.", dimension: "apertura", score: 1 },
-            { text: "Disfruto de las sorpresas y la espontaneidad.", dimension: "apertura", score: 1 },
-            { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 },
-            { text: "No me gusta el cambio, prefiero lo familiar.", dimension: "apertura", score: -1 },
-            { text: "Prefiero las cosas concretas a las ideas abstractas.", dimension: "apertura", score: -1 },
-            { text: "Me siento incómodo/a cuando se altera mi rutina.", dimension: "apertura", score: -1 },
-            // Mentira / Coherencia (8)
-            { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 },
-            { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 },
-            { text: "Nunca he dicho una mentira, ni siquiera una pequeña.", dimension: "mentira", score: 1 },
-            { text: "Siempre estoy de buen humor.", dimension: "mentira", score: 1 },
-            { text: "Todas mis costumbres son buenas y deseables.", dimension: "mentira", score: 1 },
-            { text: "Nunca me he aprovechado de alguien para salir ganando.", dimension: "mentira", score: 1 },
-            { text: "Siempre escucho atentamente, incluso a personas que no me interesan.", dimension: "mentira", score: 1 },
-            { text: "Nunca he sentido la tentación de hacer algo incorrecto.", dimension: "mentira", score: 1 }
+            { text: "Me considero una persona puntual y organizada.", dimension: "responsabilidad", score: 1 }, { text: "Reviso mi trabajo varias veces para asegurar que no tenga errores.", dimension: "responsabilidad", score: 1 }, { text: "Planifico mis actividades con antelación.", dimension: "responsabilidad", score: 1 }, { text: "Termino lo que empiezo, incluso si es difícil.", dimension: "responsabilidad", score: 1 }, { text: "A veces dejo las tareas para el último momento.", dimension: "responsabilidad", score: -1 }, { text: "Suelo dejar las cosas desordenadas.", dimension: "responsabilidad", score: -1 }, { text: "Me distraigo con facilidad de mis tareas.", dimension: "responsabilidad", score: -1 }, { text: "A menudo olvido pequeños detalles importantes.", dimension: "responsabilidad", score: -1 }, { text: "Disfruto más trabajando en equipo que solo/a.", dimension: "sociabilidad", score: 1 }, { text: "Me resulta fácil iniciar conversaciones con desconocidos.", dimension: "sociabilidad", score: 1 }, { text: "Me siento a gusto siendo el centro de atención.", dimension: "sociabilidad", score: 1 }, { text: "Soy una persona conversadora y animada en las reuniones.", dimension: "sociabilidad", score: 1 }, { text: "Prefiero actividades tranquilas y solitarias en mi tiempo libre.", dimension: "sociabilidad", score: -1 }, { text: "Prefiero escuchar a hablar en las conversaciones grupales.", dimension: "sociabilidad", score: -1 }, { text: "Evito las multitudes siempre que puedo.", dimension: "sociabilidad", score: -1 }, { text: "Después de un evento social, necesito tiempo a solas para recargarme.", dimension: "sociabilidad", score: -1 }, { text: "Mantengo la calma en situaciones de alta presión.", dimension: "estabilidad", score: 1 }, { text: "Rara vez me siento ansioso/a o preocupado/a.", dimension: "estabilidad", score: 1 }, { text: "Generalmente me siento relajado/a.", dimension: "estabilidad", score: 1 }, { text: "Mi estado de ánimo es bastante estable.", dimension: "estabilidad", score: 1 }, { text: "Pequeños inconvenientes pueden arruinar mi día.", dimension: "estabilidad", score: -1 }, { text: "Me frustro si las cosas no salen exactamente como las planeé.", dimension: "estabilidad", score: -1 }, { text: "Me irrito con facilidad.", dimension: "estabilidad", score: -1 }, { text: "Suelo pensar en lo peor que podría pasar.", dimension: "estabilidad", score: -1 }, { text: "Me adapto con facilidad a nuevos procesos y tecnologías.", dimension: "apertura", score: 1 }, { text: "Estoy abierto/a a escuchar críticas sobre mi trabajo.", dimension: "apertura", score: 1 }, { text: "Tengo una imaginación muy activa.", dimension: "apertura", score: 1 }, { text: "Disfruto de las sorpresas y la espontaneidad.", dimension: "apertura", score: 1 }, { text: "Prefiero seguir métodos que ya conozco en lugar de probar nuevos.", dimension: "apertura", score: -1 }, { text: "No me gusta el cambio, prefiero lo familiar.", dimension: "apertura", score: -1 }, { text: "Prefiero las cosas concretas a las ideas abstractas.", dimension: "apertura", score: -1 }, { text: "Me siento incómodo/a cuando se altera mi rutina.", dimension: "apertura", score: -1 }, { text: "Siempre, sin excepción, cumplo todas mis promesas.", dimension: "mentira", score: 1 }, { text: "En toda mi vida, nunca he sentido envidia de otra persona.", dimension: "mentira", score: 1 }, { text: "Nunca he dicho una mentira, ni siquiera una pequeña.", dimension: "mentira", score: 1 }, { text: "Siempre estoy de buen humor.", dimension: "mentira", score: 1 }, { text: "Todas mis costumbres son buenas y deseables.", dimension: "mentira", score: 1 }, { text: "Nunca me he aprovechado de alguien para salir ganando.", dimension: "mentira", score: 1 }, { text: "Siempre escucho atentamente, incluso a personas que no me interesan.", dimension: "mentira", score: 1 }, { text: "Nunca he sentido la tentación de hacer algo incorrecto.", dimension: "mentira", score: 1 }
         ];
-
-        const options = [
-            { text: "Totalmente en Desacuerdo", value: -2 }, { text: "En Desacuerdo", value: -1 }, { text: "Neutral", value: 0 },
-            { text: "De Acuerdo", value: 1 }, { text: "Totalmente de Acuerdo", value: 2 }
-        ];
-
+        const options = [ { text: "Totalmente en Desacuerdo", value: -2 }, { text: "En Desacuerdo", value: -1 }, { text: "Neutral", value: 0 }, { text: "De Acuerdo", value: 1 }, { text: "Totalmente de Acuerdo", value: 2 }];
         let questions = [];
-
         const containers = {
-            welcome: document.getElementById('welcome-container'), registration: document.getElementById('registration-container'), quiz: document.getElementById('quiz-container'),
-            thankYou: document.getElementById('thank-you-container'), adminLogin: document.getElementById('admin-login-container'), report: document.getElementById('report-container'),
-            reportModal: document.getElementById('report-modal'),
+            welcome: document.getElementById('welcome-container'), accessCode: document.getElementById('access-code-container'), registration: document.getElementById('registration-container'), quiz: document.getElementById('quiz-container'),
+            thankYou: document.getElementById('thank-you-container'), adminLogin: document.getElementById('admin-login-container'), adminPanel: document.getElementById('admin-panel-container'), reportModal: document.getElementById('report-modal'),
         };
         const confirmationContainer = document.getElementById('confirmation-container');
         const confirmBtn = document.getElementById('confirm-btn');
         const nextBtn = document.getElementById('next-btn');
-
-        let currentQuestionIndex = 0, currentUser = {}, scores = {}, allResultsCache = [], tempSelectedValue = null;
+        let currentQuestionIndex = 0, currentUser = {}, scores = {}, allResultsCache = [], tempSelectedValue = null, currentAccessCode = null, currentResultDocId = null;
 
         function showScreen(screenName) {
             Object.values(containers).forEach(c => c.classList.add('hidden'));
             if (containers[screenName]) containers[screenName].classList.remove('hidden');
         }
-        
-        // Función para barajar las preguntas
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('start-test-btn').addEventListener('click', () => showScreen('registration'));
+            document.getElementById('start-test-btn').addEventListener('click', () => showScreen('accessCode'));
             document.getElementById('view-report-btn').addEventListener('click', () => showScreen('adminLogin'));
-            document.getElementById('registration-form').addEventListener('submit', e => {
-                e.preventDefault();
-                currentUser.name = document.getElementById('nombre').value;
-                currentUser.id = document.getElementById('cedula').value;
-                startQuiz();
-            });
+            document.getElementById('access-code-form').addEventListener('submit', handleAccessCodeSubmit);
+            document.getElementById('access-code-back-btn').addEventListener('click', () => showScreen('welcome'));
+            document.getElementById('registration-form').addEventListener('submit', handleRegistration);
             document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
             document.getElementById('admin-back-btn').addEventListener('click', () => showScreen('welcome'));
-            document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen('welcome'));
-            document.getElementById('report-back-btn').addEventListener('click', () => showScreen('welcome'));
+            document.getElementById('admin-logout-btn').addEventListener('click', () => showScreen('welcome'));
+            document.getElementById('back-to-home-btn').addEventListener('click', () => { showScreen('welcome'); location.reload(); });
+            document.getElementById('tab-results').addEventListener('click', () => switchAdminTab('results'));
+            document.getElementById('tab-codes').addEventListener('click', () => switchAdminTab('codes'));
+            document.getElementById('generate-code-btn').addEventListener('click', generateNewAccessCode);
             confirmBtn.addEventListener('click', confirmAnswer);
             nextBtn.addEventListener('click', processAndGoToNext);
         });
 
-        function startQuiz() {
-            currentQuestionIndex = 0;
-            scores = { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 };
-            questions = [...allQuestions]; // Copia para no modificar el original
-            shuffleArray(questions); // Baraja las preguntas al iniciar
+        async function handleAccessCodeSubmit(e) {
+            e.preventDefault();
+            const codeInput = document.getElementById('access-code');
+            const code = codeInput.value;
+            const errorEl = document.getElementById('access-code-error');
+            errorEl.classList.add('hidden');
+            if (!code) return;
+
+            const q = query(collection(db, "accessCodes"), where("code", "==", code));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                errorEl.textContent = "El código ingresado no es válido.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            const codeDoc = querySnapshot.docs[0];
+            currentAccessCode = { id: codeDoc.id, ...codeDoc.data() };
+
+            if (currentAccessCode.status === 'used') {
+                errorEl.textContent = "Este código ya fue utilizado.";
+                errorEl.classList.remove('hidden');
+            } else if (currentAccessCode.status === 'in-progress') {
+                const resultDoc = await getDoc(doc(db, "farmaNovaResults", currentAccessCode.resultId));
+                if (resultDoc.exists()) {
+                    const resultData = resultDoc.data();
+                    currentUser = { name: resultData.name, id: resultData.id };
+                    scores = resultData.scores;
+                    currentQuestionIndex = resultData.currentQuestionIndex || 0;
+                    currentResultDocId = resultDoc.id;
+                    startQuiz(true); // true indica que es una reanudación
+                }
+            } else { // 'unused'
+                showScreen('registration');
+            }
+        }
+
+        async function handleRegistration(e) {
+            e.preventDefault();
+            currentUser.name = document.getElementById('nombre').value;
+            currentUser.id = document.getElementById('cedula').value;
+            
+            const newResult = { ...currentUser, scores: { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 }, status: 'in-progress', currentQuestionIndex: 0, createdAt: serverTimestamp() };
+            const resultDocRef = await addDoc(collection(db, "farmaNovaResults"), newResult);
+            currentResultDocId = resultDocRef.id;
+
+            await updateDoc(doc(db, "accessCodes", currentAccessCode.id), {
+                status: 'in-progress',
+                resultId: currentResultDocId
+            });
+            startQuiz(false); // No es reanudación
+        }
+
+        function startQuiz(isResuming = false) {
+            if (!isResuming) {
+                scores = { responsabilidad: 0, sociabilidad: 0, estabilidad: 0, apertura: 0, mentira: 0 };
+                currentQuestionIndex = 0;
+            }
+            questions = [...allQuestions];
+            shuffleArray(questions);
             showQuestion();
             showScreen('quiz');
         }
@@ -344,197 +363,154 @@
                 optionsContainer.appendChild(button);
             });
         }
-
-        function handleOptionClick(value, clickedButton) {
-            document.querySelectorAll('#options-container .option-btn').forEach(btn => btn.classList.remove('selected'));
-            clickedButton.classList.add('selected');
-            tempSelectedValue = value;
-            confirmationContainer.classList.remove('hidden');
-        }
-
-        function confirmAnswer() {
-            if (tempSelectedValue === null) return;
-            document.querySelectorAll('#options-container .option-btn').forEach(btn => {
-                btn.onclick = null;
-                btn.style.cursor = 'not-allowed';
-            });
-            nextBtn.disabled = false;
-            confirmBtn.classList.add('hidden');
-        }
-
-        function processAndGoToNext() {
-            const question = questions[currentQuestionIndex];
-            scores[question.dimension] += tempSelectedValue * (question.score || 1);
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                finishQuiz();
-            }
-        }
+        function handleOptionClick(value, clickedButton) { document.querySelectorAll('#options-container .option-btn').forEach(btn => btn.classList.remove('selected')); clickedButton.classList.add('selected'); tempSelectedValue = value; confirmationContainer.classList.remove('hidden'); }
+        function confirmAnswer() { if (tempSelectedValue === null) return; document.querySelectorAll('#options-container .option-btn').forEach(btn => { btn.onclick = null; btn.style.cursor = 'not-allowed'; }); nextBtn.disabled = false; confirmBtn.classList.add('hidden'); }
+        async function processAndGoToNext() { const question = questions[currentQuestionIndex]; scores[question.dimension] += tempSelectedValue * (question.score || 1); currentQuestionIndex++; await saveProgress(); if (currentQuestionIndex < questions.length) { showQuestion(); } else { finishQuiz(); } }
+        async function saveProgress() { if (!currentResultDocId) return; await updateDoc(doc(db, "farmaNovaResults", currentResultDocId), { scores, currentQuestionIndex }); }
 
         async function finishQuiz() {
             document.getElementById('options-container').classList.add('hidden');
             document.getElementById('quiz-loader').classList.remove('hidden');
-            const finalResult = { ...currentUser, scores, createdAt: serverTimestamp() };
             
-            try {
-                await addDoc(collection(db, "farmaNovaResults"), finalResult);
-            } catch (error) {
-                console.error("Error al guardar en Firestore:", error);
-                alert(`Error CRÍTICO al guardar en la base de datos: ${error.message}. Por favor, avisa al administrador.`);
-                document.getElementById('quiz-loader').classList.add('hidden');
-                document.getElementById('options-container').classList.remove('hidden');
-                return;
-            }
+            await updateDoc(doc(db, "farmaNovaResults", currentResultDocId), { status: 'completed' });
+            await updateDoc(doc(db, "accessCodes", currentAccessCode.id), { status: 'used' });
 
-            try {
-                const templateParams = { candidate_name: currentUser.name };
-                await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, templateParams, { publicKey: emailJSConfig.publicKey });
-            } catch (error) {
-                console.warn("La prueba se guardó correctamente, pero falló el envío de la notificación por email.", error);
-            }
+            try { await emailjs.send(emailJSConfig.serviceID, emailJSConfig.templateID, { candidate_name: currentUser.name }, { publicKey: emailJSConfig.publicKey }); } catch (error) { console.warn("Fallo el envío de email.", error); }
             
             showScreen('thankYou');
             document.getElementById('quiz-loader').classList.add('hidden');
             document.getElementById('options-container').classList.remove('hidden');
         }
 
-
         async function handleAdminLogin(e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             const errorEl = document.getElementById('admin-error');
-            if (user === 'ADMIN' && pass === '9999') {
-                errorEl.classList.add('hidden');
-                showScreen('report');
-                await loadReports();
+            if (user === 'ADMIN' && pass === '9999') { errorEl.classList.add('hidden'); showScreen('adminPanel'); switchAdminTab('results'); } else { errorEl.classList.remove('hidden'); }
+        }
+
+        function switchAdminTab(tabName) {
+            const tabResults = document.getElementById('tab-results');
+            const tabCodes = document.getElementById('tab-codes');
+            const reportContainer = document.getElementById('report-container');
+            const codeManagerContainer = document.getElementById('code-manager-container');
+            if (tabName === 'results') {
+                tabResults.classList.add('text-blue-600', 'border-blue-600');
+                tabResults.classList.remove('text-gray-500');
+                tabCodes.classList.add('text-gray-500');
+                tabCodes.classList.remove('text-blue-600', 'border-blue-600');
+                reportContainer.classList.remove('hidden');
+                codeManagerContainer.classList.add('hidden');
+                loadReports();
             } else {
-                errorEl.classList.remove('hidden');
+                tabCodes.classList.add('text-blue-600', 'border-blue-600');
+                tabCodes.classList.remove('text-gray-500');
+                tabResults.classList.add('text-gray-500');
+                tabResults.classList.remove('text-blue-600', 'border-blue-600');
+                codeManagerContainer.classList.remove('hidden');
+                reportContainer.classList.add('hidden');
+                loadAccessCodes();
             }
         }
 
-        async function loadReports() {
-            const reportLoader = document.getElementById('report-loader');
-            const reportContent = document.getElementById('report-content');
-            reportLoader.classList.remove('hidden');
-            reportContent.classList.add('hidden');
+        async function generateNewAccessCode() {
+            const displayEl = document.getElementById('new-code-display');
+            displayEl.textContent = 'Generando...';
+            displayEl.classList.remove('hidden');
+
             try {
-                const q = query(collection(db, "farmaNovaResults"), orderBy("createdAt", "desc"));
+                const year = new Date().getFullYear().toString();
+                const startOfYear = year + "000";
+                
+                const q = query(collection(db, "accessCodes"), where("code", ">", startOfYear), orderBy("code", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                let lastConsecutive = 0;
+                if (!querySnapshot.empty) {
+                    const lastCode = querySnapshot.docs[0].data().code;
+                    if (lastCode.startsWith(year)) {
+                        lastConsecutive = parseInt(lastCode.substring(4));
+                    }
+                }
+                
+                const newConsecutive = lastConsecutive + 1;
+                const newCode = year + newConsecutive.toString().padStart(3, '0');
+                const newCodeData = { code: newCode, status: 'unused', createdAt: serverTimestamp() };
+                
+                await addDoc(collection(db, "accessCodes"), newCodeData);
+                
+                displayEl.textContent = `Nuevo Código Generado: ${newCode}`;
+                loadAccessCodes();
+
+            } catch (err) {
+                console.error("Error generating code:", err);
+                alert('Error generando el código.');
+                displayEl.classList.add('hidden');
+            }
+        }
+
+
+        async function loadAccessCodes() {
+            const loader = document.getElementById('code-loader');
+            const content = document.getElementById('code-content');
+            loader.classList.remove('hidden'); content.classList.add('hidden');
+            try {
+                const q = query(collection(db, "accessCodes"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                const codes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const tableBody = document.getElementById('code-table-body');
+                const noCodesMsg = document.getElementById('no-codes');
+                tableBody.innerHTML = '';
+                if (codes.length === 0) { noCodesMsg.classList.remove('hidden'); } else {
+                    noCodesMsg.classList.add('hidden');
+                    codes.forEach(code => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td class="py-4 px-4 whitespace-nowrap font-mono">${code.code}</td><td class="py-4 px-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${code.status === 'unused' ? 'bg-green-100 text-green-800' : code.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${code.status}</span></td><td class="py-4 px-4 whitespace-nowrap">${code.createdAt.toDate().toLocaleString('es-CO')}</td>`;
+                        tableBody.appendChild(row);
+                    });
+                }
+            } catch (error) { console.error("Error:", error); alert("No se pudieron cargar los códigos."); } finally { loader.classList.add('hidden'); content.classList.remove('hidden'); }
+        }
+
+        async function loadReports() {
+            const reportLoader = document.getElementById('report-loader'); const reportContent = document.getElementById('report-content');
+            reportLoader.classList.remove('hidden'); reportContent.classList.add('hidden');
+            try {
+                const q = query(collection(db, "farmaNovaResults"), where("status", "==", "completed"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
                 allResultsCache = querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-                const tableBody = document.getElementById('report-table-body');
-                const noReportsMsg = document.getElementById('no-reports');
+                const tableBody = document.getElementById('report-table-body'); const noReportsMsg = document.getElementById('no-reports');
                 tableBody.innerHTML = '';
-                if (allResultsCache.length === 0) {
-                    noReportsMsg.classList.remove('hidden');
-                } else {
+                if (allResultsCache.length === 0) { noReportsMsg.classList.remove('hidden'); } else {
                     noReportsMsg.classList.add('hidden');
                     allResultsCache.forEach(result => {
                         const row = document.createElement('tr');
                         row.innerHTML = `<td class="py-4 px-4 whitespace-nowrap">${result.name}</td><td class="py-4 px-4 whitespace-nowrap">${result.id}</td><td class="py-4 px-4 whitespace-nowrap">${result.createdAt.toDate().toLocaleString('es-CO')}</td><td class="py-4 px-4 whitespace-nowrap"><button class="text-blue-600 hover:underline font-semibold" data-doc-id="${result.docId}">Ver Reporte</button></td>`;
                         tableBody.appendChild(row);
                     });
-                    tableBody.querySelectorAll('button').forEach(button => {
-                        button.addEventListener('click', (e) => showDetailedReport(e.target.dataset.docId));
-                    });
+                    tableBody.querySelectorAll('button').forEach(button => button.addEventListener('click', (e) => showDetailedReport(e.target.dataset.docId)));
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("No se pudieron cargar los reportes.");
-            } finally {
-                reportLoader.classList.add('hidden');
-                reportContent.classList.remove('hidden');
-            }
+            } catch (error) { console.error("Error:", error); alert("No se pudieron cargar los reportes."); } finally { reportLoader.classList.add('hidden'); reportContent.classList.remove('hidden'); }
         }
-        
         function getDimensionDescription(dimension, score) {
             const descriptions = {
-                responsabilidad: {
-                    high: "Muy alta. Perfil altamente organizado, confiable y orientado al detalle.",
-                    mid: "Adecuada. Muestra un buen nivel de compromiso y organización.",
-                    low: "Baja. Puede presentar dificultades con la planificación y el seguimiento de tareas."
-                },
-                sociabilidad: {
-                    high: "Muy alta. Perfil extrovertido, comunicativo y que disfruta del trabajo en equipo.",
-                    mid: "Adecuada. Se desenvuelve bien en entornos sociales y de colaboración.",
-                    low: "Baja. Prefiere el trabajo individual y puede ser reservado/a en grupos."
-                },
-                estabilidad: {
-                    high: "Muy alta. Gran capacidad para manejar el estrés y mantener la calma bajo presión.",
-                    mid: "Adecuada. Maneja las situaciones de presión de manera competente.",
-                    low: "Baja. Puede ser susceptible al estrés y a la frustración ante imprevistos."
-                },
-                apertura: {
-                    high: "Muy alta. Perfil muy curioso, creativo y abierto a nuevas ideas y cambios.",
-                    mid: "Adecuada. Se adapta a los cambios y muestra interés por aprender.",
-                    low: "Baja. Prefiere la rutina y los métodos establecidos, puede resistirse al cambio."
-                }
+                responsabilidad: { high: "Muy alta. Perfil altamente organizado, confiable y orientado al detalle.", mid: "Adecuada. Muestra un buen nivel de compromiso y organización.", low: "Baja. Puede presentar dificultades con la planificación y el seguimiento de tareas." },
+                sociabilidad: { high: "Muy alta. Perfil extrovertido, comunicativo y que disfruta del trabajo en equipo.", mid: "Adecuada. Se desenvuelve bien en entornos sociales y de colaboración.", low: "Baja. Prefiere el trabajo individual y puede ser reservado/a en grupos." },
+                estabilidad: { high: "Muy alta. Gran capacidad para manejar el estrés y mantener la calma bajo presión.", mid: "Adecuada. Maneja las situaciones de presión de manera competente.", low: "Baja. Puede ser susceptible al estrés y a la frustración ante imprevistos." },
+                apertura: { high: "Muy alta. Perfil muy curioso, creativo y abierto a nuevas ideas y cambios.", mid: "Adecuada. Se adapta a los cambios y muestra interés por aprender.", low: "Baja. Prefiere la rutina y los métodos establecidos, puede resistirse al cambio." }
             };
-            // Umbrales ajustados para un rango de -16 a 16
-            if (score > 6) return descriptions[dimension].high;
-            if (score >= -6) return descriptions[dimension].mid;
-            return descriptions[dimension].low;
+            if (score > 6) return descriptions[dimension].high; if (score >= -6) return descriptions[dimension].mid; return descriptions[dimension].low;
         }
-
         function showDetailedReport(docId) {
-            const result = allResultsCache.find(r => r.docId === docId);
-            if (!result) return;
-
-            // --- LÓGICA DE EVALUACIÓN AJUSTADA PARA 40 PREGUNTAS ---
-            const maxScore = 16; // 8 preguntas por dimensión * 2 puntos max
-            const r = result.scores.responsabilidad / maxScore;
-            const s = result.scores.sociabilidad / maxScore;
-            const e = result.scores.estabilidad / maxScore;
-            const a = result.scores.apertura / maxScore;
-
-            const weightedAvg = (r * 0.4) + (s * 0.2) + (e * 0.2) + (a * 0.2); // Mayor peso a responsabilidad
-            const personalityScore = (weightedAvg + 1) / 2 * 10;
-
-            let liePenalty = 0;
-            // Penalización más ajustada para un rango de -16 a 16
-            if (result.scores.mentira > 8) { // Umbral más alto
-                liePenalty = (result.scores.mentira - 8) * 0.75; // Penalización más gradual
-            }
-
-            let viability = personalityScore - liePenalty;
-            viability = Math.max(0, Math.min(10, viability));
-
+            const result = allResultsCache.find(r => r.docId === docId); if (!result) return;
+            const maxScore = 16; const r = result.scores.responsabilidad / maxScore; const s = result.scores.sociabilidad / maxScore; const e = result.scores.estabilidad / maxScore; const a = result.scores.apertura / maxScore;
+            const weightedAvg = (r * 0.4) + (s * 0.2) + (e * 0.2) + (a * 0.2); const personalityScore = (weightedAvg + 1) / 2 * 10;
+            let liePenalty = 0; if (result.scores.mentira > 8) { liePenalty = (result.scores.mentira - 8) * 0.75; }
+            let viability = personalityScore - liePenalty; viability = Math.max(0, Math.min(10, viability));
+            function getViabilityColor(score) { if (score < 5) return 'text-red-500'; if (score > 7) return 'text-green-600'; return 'text-yellow-500'; }
             const modalContent = document.getElementById('modal-content');
-            modalContent.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div><h3 class="text-2xl font-bold">${result.name}</h3><p class="text-gray-500">C.C. ${result.id}</p></div>
-                    <button id="close-modal-btn" class="text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button>
-                </div>
-                <div class="mt-6 border-t pt-6">
-                    <h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -16 a 16)</h4>
-                    <div class="space-y-4">
-                        <div>
-                            <p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p>
-                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('responsabilidad', result.scores.responsabilidad)}</p>
-                        </div>
-                        <div>
-                            <p><strong>Sociabilidad:</strong> ${result.scores.sociabilidad}</p>
-                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('sociabilidad', result.scores.sociabilidad)}</p>
-                        </div>
-                        <div>
-                            <p><strong>Estabilidad Emocional:</strong> ${result.scores.estabilidad}</p>
-                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('estabilidad', result.scores.estabilidad)}</p>
-                        </div>
-                        <div>
-                            <p><strong>Apertura al Cambio:</strong> ${result.scores.apertura}</p>
-                            <p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('apertura', result.scores.apertura)}</p>
-                        </div>
-                    </div>
-                    <h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Coherencia</h4>
-                    <p class="${result.scores.mentira > 8 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -16 a 16) - ${result.scores.mentira > 8 ? 'Posible tendencia a dar respuestas socialmente deseables.' : 'Respuestas consistentes.'}</p>
-                </div>
-                <div class="mt-8 bg-gray-50 p-6 rounded-lg text-center">
-                    <h4 class="text-lg font-semibold">Concepto General</h4>
-                    <p class="text-5xl font-extrabold ${viability < 5 ? 'text-red-500' : viability > 7 ? 'text-green-600' : 'text-yellow-500'} mt-2">${viability.toFixed(1)} / 10</p>
-                    <p class="text-sm text-gray-600 mt-1">Viabilidad de Contratación</p>
-                </div>`;
+            modalContent.innerHTML = `<div class="flex justify-between items-start"><div><h3 class="text-2xl font-bold">${result.name}</h3><p class="text-gray-500">C.C. ${result.id}</p></div><button id="close-modal-btn" class="text-2xl font-bold text-gray-400 hover:text-gray-800">&times;</button></div><div class="mt-6 border-t pt-6"><h4 class="text-lg font-semibold mb-4">Dimensiones de Personalidad (de -16 a 16)</h4><div class="space-y-4"><div><p><strong>Responsabilidad:</strong> ${result.scores.responsabilidad}</p><p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('responsabilidad', result.scores.responsabilidad)}</p></div><div><p><strong>Sociabilidad:</strong> ${result.scores.sociabilidad}</p><p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('sociabilidad', result.scores.sociabilidad)}</p></div><div><p><strong>Estabilidad Emocional:</strong> ${result.scores.estabilidad}</p><p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('estabilidad', result.scores.estabilidad)}</p></div><div><p><strong>Apertura al Cambio:</strong> ${result.scores.apertura}</p><p class="text-sm text-gray-600 italic pl-2 border-l-2 border-blue-200 mt-1">${getDimensionDescription('apertura', result.scores.apertura)}</p></div></div><h4 class="text-lg font-semibold mt-6 mb-2">Indicador de Coherencia</h4><p class="${result.scores.mentira > 8 ? 'text-red-600 font-bold' : 'text-green-600'}">Puntaje de "Mentira": ${result.scores.mentira} (de -16 a 16) - ${result.scores.mentira > 8 ? 'Posible tendencia a dar respuestas socialmente deseables.' : 'Respuestas consistentes.'}</p></div><div class="mt-8 bg-gray-50 p-6 rounded-lg text-center"><h4 class="text-lg font-semibold">Concepto General</h4><p class="text-5xl font-extrabold ${getViabilityColor(viability)} mt-2">${viability.toFixed(1)} / 10</p><p class="text-sm text-gray-600 mt-1">Viabilidad de Contratación</p></div>`;
             document.getElementById('close-modal-btn').addEventListener('click', () => containers.reportModal.classList.add('hidden'));
             containers.reportModal.classList.remove('hidden');
         }
